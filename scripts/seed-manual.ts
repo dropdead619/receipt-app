@@ -8,6 +8,9 @@
 import { createClient } from '@supabase/supabase-js'
 import { persistRecipe } from '../server/utils/persistRecipe'
 import { RECIPES } from './recipes-data'
+import { RECIPES_2 } from './recipes-data-2'
+
+const ALL = [...RECIPES, ...RECIPES_2]
 
 async function main() {
   const url = process.env.SUPABASE_URL
@@ -23,21 +26,21 @@ async function main() {
   const { error: ingErr } = await supabase.from('ingredients').delete().not('id', 'is', null)
   if (ingErr) console.warn('  ingredients не полностью очищены:', ingErr.message)
 
-  console.log(`Заливаю ${RECIPES.length} рецептов (КБЖУ по USDA)…\n`)
+  console.log(`Заливаю ${ALL.length} рецептов (КБЖУ по USDA)…\n`)
   let ok = 0
   let unverified = 0
-  for (let i = 0; i < RECIPES.length; i++) {
-    const r = RECIPES[i]!
+  for (let i = 0; i < ALL.length; i++) {
+    const r = ALL[i]!
     try {
       const res = await persistRecipe(supabase, r)
       ok++
       if (!res.verified) unverified++
       console.log(
-        `[${i + 1}/${RECIPES.length}] ${res.verified ? '✓' : '⚠'} ${r.title}` +
+        `[${i + 1}/${ALL.length}] ${res.verified ? '✓' : '⚠'} ${r.title}` +
           (res.unresolved.length ? `  — не нашлось в USDA: ${res.unresolved.join(', ')}` : ''),
       )
     } catch (e) {
-      console.error(`[${i + 1}/${RECIPES.length}] ✗ ${r.title}: ${(e as Error).message}`)
+      console.error(`[${i + 1}/${ALL.length}] ✗ ${r.title}: ${(e as Error).message}`)
     }
   }
   console.log(`\nГотово: ${ok} сохранено, из них ${unverified} непроверённых (КБЖУ).`)
