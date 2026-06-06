@@ -28,6 +28,13 @@ export default defineNuxtConfig({
   // запекаются в бандл на этапе сборки. Серверный код читает их через process.env
   // в рантайме (см. server/utils/anthropic.ts, nutrition.ts).
 
+  runtimeConfig: {
+    // Пустой дефолт перебивает значение, которое модуль Supabase иначе запёк бы
+    // в сборку из env (defu отдаёт приоритет нашему конфигу). Реальный секрет
+    // подставляется в рантайме из NUXT_SUPABASE_SECRET_KEY — в бандл не попадает.
+    supabase: { secretKey: '', serviceKey: '' },
+  },
+
   app: {
     head: {
       htmlAttrs: { lang: 'ru' },
