@@ -12,6 +12,17 @@ const user = useSupabaseUser()
 
 await household.load()
 
+// Диагностика сессии: есть ли у клиента access-token и совпадает ли uid
+const sessionDebug = ref('проверка…')
+onMounted(async () => {
+  const { data } = await supabase.auth.getSession()
+  const t = data.session?.access_token
+  const sUid = data.session?.user?.id
+  sessionDebug.value = t
+    ? `токен ЕСТЬ (${t.length} симв.) · session uid ${sUid?.slice(0, 8)} ${sUid === user.value?.id ? '== ' : '≠ '}profile uid ${user.value?.id?.slice(0, 8)}`
+    : 'токена НЕТ — клиент анонимен (вот почему RLS отклоняет запись)'
+})
+
 type Draft = Partial<HouseholdMember>
 const drafts = ref<Draft[]>([])
 
@@ -113,6 +124,10 @@ async function logout() {
       :class="status.kind === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'"
     >
       {{ status.text }}
+    </p>
+
+    <p class="mt-2 rounded-lg bg-sand-100 px-3 py-2 font-mono text-[11px] text-sand-600">
+      🔎 {{ sessionDebug }}
     </p>
 
     <h2 class="mb-3 mt-6 text-sm font-bold uppercase tracking-wide text-sand-500">
