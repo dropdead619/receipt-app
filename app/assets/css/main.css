@@ -1,0 +1,75 @@
+@import 'tailwindcss';
+
+/* ── Дизайн-система: тёплая, аппетитная палитра ── */
+@theme {
+  /* Акцент — терракотово-оранжевый */
+  --color-brand-50: #fdf3ef;
+  --color-brand-100: #fbe3d8;
+  --color-brand-200: #f6c3ad;
+  --color-brand-300: #f09b78;
+  --color-brand-400: #ec7c52;
+  --color-brand-500: #e8633a;
+  --color-brand-600: #d44a23;
+  --color-brand-700: #b03a1c;
+  --color-brand-800: #8d301b;
+  --color-brand-900: #722b1b;
+
+  /* Нейтральная серо-бежевая база */
+  --color-sand-50: #faf8f5;
+  --color-sand-100: #f3efe9;
+  --color-sand-200: #e7e0d6;
+  --color-sand-300: #d6cabb;
+  --color-sand-400: #b4a692;
+  --color-sand-500: #8f8270;
+  --color-sand-600: #6f6453;
+  --color-sand-700: #534a3e;
+  --color-sand-800: #38322a;
+  --color-sand-900: #221e19;
+
+  /* Семантика КБЖУ */
+  --color-kcal: #e8633a;
+  --color-protein: #3b82f6;
+  --color-fat: #f59e0b;
+  --color-carb: #10b981;
+
+  --font-sans: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 1rem;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-sand-50 text-sand-900 antialiased;
+    font-family: var(--font-sans);
+  }
+  /* Безопасные зоны iOS */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl bg-white shadow-sm ring-1 ring-sand-200/60;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-3 font-semibold text-white transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-sand-100 px-4 py-3 font-semibold text-sand-700 transition active:scale-[0.98];
+  }
+  .chip {
+    @apply inline-flex shrink-0 items-center gap-1 rounded-full border border-sand-200 bg-white px-3 py-1.5 text-sm font-medium text-sand-600 transition;
+  }
+  .chip-active {
+    @apply border-brand-500 bg-brand-50 text-brand-700;
+  }
+  .input {
+    @apply w-full rounded-xl border border-sand-200 bg-white px-4 py-3 text-sand-900 outline-none transition placeholder:text-sand-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-100;
+  }
+}

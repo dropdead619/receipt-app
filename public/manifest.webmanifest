@@ -1,0 +1,17 @@
+{
+  "name": "Рецепты под ваш каллораж",
+  "short_name": "Рецепты",
+  "description": "Рецепты с адаптацией КБЖУ на двоих, меню недели и список закупа",
+  "lang": "ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#e8633a",
+  "background_color": "#faf8f5",
+  "icons": [
+    { "src": "/pwa-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/pwa-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

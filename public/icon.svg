@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#e8633a"/>
+  <!-- Сковорода -->
+  <g fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 250 h180 a52 52 0 0 1 0 104 H190 a70 70 0 0 1 -70 -70 z"/>
+    <path d="M300 264 l72 -42"/>
+    <!-- Пар -->
+    <path d="M180 196 c0 -22 22 -22 22 -44"/>
+    <path d="M232 196 c0 -22 22 -22 22 -44"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+# Деплой Nuxt 4 (SSR) на Netlify.
+# Nitro автоматически выбирает preset `netlify` в CI Netlify и собирает в ./dist
+# (+ serverless-функции). Переменные окружения задаются в дашборде Netlify
+# (Site settings → Environment variables), НЕ в репозитории:
+#   SUPABASE_URL, SUPABASE_KEY, NUXT_SUPABASE_SECRET_KEY, ANTHROPIC_API_KEY, USDA_API_KEY
+
+[build]
+  command = "pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # pnpm берётся из поля packageManager в package.json через corepack
+  NETLIFY_USE_PNPM = "true"
