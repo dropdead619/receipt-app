@@ -13,19 +13,19 @@ export const useHouseholdStore = defineStore('household', () => {
   async function load(force = false) {
     if (loaded.value && !force) return
     const supabase = useSupabaseClient()
-    const user = useSupabaseUser()
-    if (!user.value) return
+    const uid = currentUserId()
+    if (!uid) return
 
     const [{ data: m }, { data: s }] = await Promise.all([
       supabase
         .from('household_members')
         .select('*')
-        .eq('user_id', user.value.id)
+        .eq('user_id', uid)
         .order('created_at', { ascending: true }),
       supabase
         .from('user_settings')
         .select('meal_shares')
-        .eq('user_id', user.value.id)
+        .eq('user_id', uid)
         .maybeSingle(),
     ])
 
@@ -38,9 +38,9 @@ export const useHouseholdStore = defineStore('household', () => {
 
   async function saveMember(member: Partial<HouseholdMember>) {
     const supabase = useSupabaseClient()
-    const user = useSupabaseUser()
-    if (!user.value) throw new Error('Сессия не найдена — войдите заново')
-    const payload = { ...member, user_id: user.value.id }
+    const uid = currentUserId()
+    if (!uid) throw new Error('Сессия не найдена — войдите заново')
+    const payload = { ...member, user_id: uid }
     const { data, error } = await supabase
       .from('household_members')
       .upsert(payload)
@@ -59,12 +59,12 @@ export const useHouseholdStore = defineStore('household', () => {
 
   async function saveShares(next: MealShares) {
     const supabase = useSupabaseClient()
-    const user = useSupabaseUser()
-    if (!user.value) throw new Error('Сессия не найдена — войдите заново')
+    const uid = currentUserId()
+    if (!uid) throw new Error('Сессия не найдена — войдите заново')
     shares.value = next
     const { error } = await supabase
       .from('user_settings')
-      .upsert({ user_id: user.value.id, meal_shares: next })
+      .upsert({ user_id: uid, meal_shares: next })
     if (error) throw error
   }
 

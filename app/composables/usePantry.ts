@@ -8,14 +8,14 @@ export interface PantryItem {
 
 export function usePantry() {
   const supabase = useSupabaseClient()
-  const user = useSupabaseUser()
 
   async function list(): Promise<PantryItem[]> {
-    if (!user.value) return []
+    const uid = currentUserId()
+    if (!uid) return []
     const { data } = await supabase
       .from('pantry_items')
       .select('id, ingredient_id, quantity, unit, ingredients(name)')
-      .eq('user_id', user.value.id)
+      .eq('user_id', uid)
       .order('created_at', { ascending: false })
     return (data ?? []).map((r: Record<string, unknown>) => ({
       id: r.id as string,
@@ -27,10 +27,11 @@ export function usePantry() {
   }
 
   async function add(ingredientId: string, quantity?: number, unit?: string) {
-    if (!user.value) return
+    const uid = currentUserId()
+    if (!uid) return
     await supabase.from('pantry_items').upsert(
       {
-        user_id: user.value.id,
+        user_id: uid,
         ingredient_id: ingredientId,
         quantity: quantity ?? null,
         unit: unit ?? null,

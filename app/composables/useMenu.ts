@@ -26,21 +26,21 @@ export function addWeeks(weekStart: string, delta: number): string {
 
 export function useMenu() {
   const supabase = useSupabaseClient()
-  const user = useSupabaseUser()
 
   async function getOrCreateWeek(weekStart: string): Promise<string | null> {
-    if (!user.value) return null
+    const uid = currentUserId()
+    if (!uid) return null
     const { data: existing } = await supabase
       .from('weekly_menus')
       .select('id')
-      .eq('user_id', user.value.id)
+      .eq('user_id', uid)
       .eq('week_start_date', weekStart)
       .maybeSingle()
     if (existing) return existing.id
 
     const { data: created, error } = await supabase
       .from('weekly_menus')
-      .insert({ user_id: user.value.id, week_start_date: weekStart })
+      .insert({ user_id: uid, week_start_date: weekStart })
       .select('id')
       .single()
     if (error) throw error

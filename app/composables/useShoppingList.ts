@@ -11,14 +11,14 @@ export interface ShoppingListItem {
 
 export function useShoppingList() {
   const supabase = useSupabaseClient()
-  const user = useSupabaseUser()
 
   async function list(): Promise<ShoppingListItem[]> {
-    if (!user.value) return []
+    const uid = currentUserId()
+    if (!uid) return []
     const { data } = await supabase
       .from('shopping_list_items')
       .select('id, ingredient_id, grams, checked, source_recipe_id, ingredients(name)')
-      .eq('user_id', user.value.id)
+      .eq('user_id', uid)
       .order('checked', { ascending: true })
     return (data ?? []).map((r: Record<string, unknown>) => ({
       id: r.id as string,
@@ -35,9 +35,10 @@ export function useShoppingList() {
     items: Array<Pick<RecipeIngredient, 'ingredient_id' | 'grams'>>,
     sourceRecipeId?: string,
   ) {
-    if (!user.value || !items.length) return
+    const uid = currentUserId()
+    if (!uid || !items.length) return
     const rows = items.map((i) => ({
-      user_id: user.value!.id,
+      user_id: uid,
       ingredient_id: i.ingredient_id,
       grams: Math.round(i.grams),
       source_recipe_id: sourceRecipeId ?? null,
@@ -54,11 +55,12 @@ export function useShoppingList() {
   }
 
   async function clearChecked() {
-    if (!user.value) return
+    const uid = currentUserId()
+    if (!uid) return
     await supabase
       .from('shopping_list_items')
       .delete()
-      .eq('user_id', user.value.id)
+      .eq('user_id', uid)
       .eq('checked', true)
   }
 
