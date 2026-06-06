@@ -13,8 +13,8 @@ export const RECIPES: GeneratedRecipe[] = [
     base_servings: 2,
     time_minutes: 15,
     ingredients: [
-      { name: 'Овсяные хлопья', name_en: 'rolled oats', grams: 100, display_text: '1 стакан', is_optional: false },
-      { name: 'Молоко', name_en: 'milk, whole', grams: 300, display_text: '1.5 стакана', is_optional: false },
+      { name: 'Овсяные хлопья', name_en: 'cereals, oats, regular', grams: 100, display_text: '1 стакан', is_optional: false },
+      { name: 'Молоко', name_en: 'milk, 3.25% milkfat', grams: 300, display_text: '1.5 стакана', is_optional: false },
       { name: 'Банан', name_en: 'banana, raw', grams: 120, display_text: '1 шт.', is_optional: false },
       { name: 'Мёд', name_en: 'honey', grams: 30, display_text: '1.5 ст. л.', is_optional: false },
     ],
@@ -82,7 +82,7 @@ export const RECIPES: GeneratedRecipe[] = [
       { name: 'Ветчина', name_en: 'ham, sliced', grams: 150, display_text: '150 г', is_optional: false },
       { name: 'Зелёный горошек', name_en: 'peas, green, raw', grams: 100, display_text: '1/2 банки', is_optional: false },
       { name: 'Огурцы', name_en: 'cucumber, raw', grams: 100, display_text: '1 шт.', is_optional: false },
-      { name: 'Майонез', name_en: 'mayonnaise', grams: 80, display_text: '4 ст. л.', is_optional: false },
+      { name: 'Майонез', name_en: 'mayonnaise, regular', grams: 80, display_text: '4 ст. л.', is_optional: false },
     ],
     steps: [
       'Отварите картофель, морковь и яйца, остудите.',
@@ -140,7 +140,7 @@ export const RECIPES: GeneratedRecipe[] = [
     time_minutes: 35,
     ingredients: [
       { name: 'Нут', name_en: 'chickpeas, canned', grams: 250, display_text: '1 банка', is_optional: false },
-      { name: 'Кокосовое молоко', name_en: 'coconut milk', grams: 200, display_text: '1 стакан', is_optional: false },
+      { name: 'Кокосовое молоко', name_en: 'coconut milk, canned', grams: 200, display_text: '1 стакан', is_optional: false },
       { name: 'Лук', name_en: 'onion, raw', grams: 80, display_text: '1 шт.', is_optional: false },
       { name: 'Томаты', name_en: 'tomato, raw', grams: 150, display_text: '2 шт.', is_optional: false },
       { name: 'Растительное масло', name_en: 'vegetable oil', grams: 20, display_text: '1.5 ст. л.', is_optional: false },
@@ -304,10 +304,10 @@ export const RECIPES: GeneratedRecipe[] = [
     time_minutes: 30,
     ingredients: [
       { name: 'Мука', name_en: 'wheat flour', grams: 150, display_text: '1 стакан', is_optional: false },
-      { name: 'Молоко', name_en: 'milk, whole', grams: 250, display_text: '1.25 стакана', is_optional: false },
+      { name: 'Молоко', name_en: 'milk, 3.25% milkfat', grams: 250, display_text: '1.25 стакана', is_optional: false },
       { name: 'Яйца', name_en: 'egg, whole, raw', grams: 100, display_text: '2 шт.', is_optional: false },
       { name: 'Сахар', name_en: 'sugar', grams: 40, display_text: '2 ст. л.', is_optional: false },
-      { name: 'Сливочное масло', name_en: 'butter', grams: 30, display_text: '30 г', is_optional: false },
+      { name: 'Сливочное масло', name_en: 'butter, salted', grams: 30, display_text: '30 г', is_optional: false },
     ],
     steps: [
       'Смешайте муку, яйца, сахар и молоко в однородное тесто.',

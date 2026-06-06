@@ -14,6 +14,15 @@ export function normalizeName(name: string): string {
 
 const cache = new Map<string, Per100g | null>()
 
+// Ингредиенты, для которых поиск USDA выдаёт не ту форму (кокосовый крем вместо
+// молока и т.п.) — задаём проверенные значения вручную (на 100 г).
+const OVERRIDES: Record<string, Per100g> = {
+  'coconut milk, canned': {
+    kcal_100g: 197, protein_100g: 2, fat_100g: 21.3, carb_100g: 2.8,
+    source_ref: 'manual:coconut-milk-canned',
+  },
+}
+
 // Номера нутриентов USDA: 203 — белок, 204 — жир, 205 — углеводы.
 // Энергия: 208 (kcal) в SR Legacy; у Foundation Foods бывает только Atwater —
 // 957 (general) / 958 (specific). Берём первый положительный.
@@ -22,6 +31,7 @@ const ENERGY_NUMS = ['208', '957', '958']
 
 export async function lookupNutrition(nameEn: string): Promise<Per100g | null> {
   const key = nameEn.trim().toLowerCase()
+  if (OVERRIDES[key]) return OVERRIDES[key]!
   if (cache.has(key)) return cache.get(key)!
 
   const apiKey = process.env.USDA_API_KEY || 'DEMO_KEY'
