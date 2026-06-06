@@ -9,8 +9,9 @@ import { createClient } from '@supabase/supabase-js'
 import { persistRecipe } from '../server/utils/persistRecipe'
 import { RECIPES } from './recipes-data'
 import { RECIPES_2 } from './recipes-data-2'
+import { RECIPES_3 } from './recipes-data-3'
 
-const ALL = [...RECIPES, ...RECIPES_2]
+const ALL = [...RECIPES, ...RECIPES_2, ...RECIPES_3]
 
 async function main() {
   const url = process.env.SUPABASE_URL
