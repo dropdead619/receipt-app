@@ -39,7 +39,7 @@ export const useHouseholdStore = defineStore('household', () => {
   async function saveMember(member: Partial<HouseholdMember>) {
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
-    if (!user.value) return
+    if (!user.value) throw new Error('Сессия не найдена — войдите заново')
     const payload = { ...member, user_id: user.value.id }
     const { data, error } = await supabase
       .from('household_members')
@@ -60,11 +60,12 @@ export const useHouseholdStore = defineStore('household', () => {
   async function saveShares(next: MealShares) {
     const supabase = useSupabaseClient()
     const user = useSupabaseUser()
-    if (!user.value) return
+    if (!user.value) throw new Error('Сессия не найдена — войдите заново')
     shares.value = next
-    await supabase
+    const { error } = await supabase
       .from('user_settings')
       .upsert({ user_id: user.value.id, meal_shares: next })
+    if (error) throw error
   }
 
   const isConfigured = computed(() => members.value.length > 0)

@@ -42,9 +42,20 @@ function initDrafts() {
 }
 initDrafts()
 
+const status = ref<{ kind: 'ok' | 'err'; text: string } | null>(null)
+function flash(kind: 'ok' | 'err', text: string) {
+  status.value = { kind, text }
+  setTimeout(() => (status.value = null), 4000)
+}
+
 async function saveMember(i: number) {
-  const saved = await household.saveMember(drafts.value[i]!)
-  if (saved) drafts.value[i] = { ...(saved as HouseholdMember) }
+  try {
+    const saved = await household.saveMember(drafts.value[i]!)
+    if (saved) drafts.value[i] = { ...(saved as HouseholdMember) }
+    flash('ok', 'Сохранено')
+  } catch (e) {
+    flash('err', `Не сохранилось: ${(e as Error).message}`)
+  }
 }
 
 async function removeMember(i: number) {
@@ -69,10 +80,15 @@ const sharesTotal = computed(() =>
   meals.reduce((s, m) => s + (sharesPct.value[m] || 0), 0),
 )
 async function saveShares() {
-  const total = sharesTotal.value || 1
-  const next = {} as MealShares
-  for (const m of meals) next[m] = (sharesPct.value[m] || 0) / total
-  await household.saveShares(next)
+  try {
+    const total = sharesTotal.value || 1
+    const next = {} as MealShares
+    for (const m of meals) next[m] = (sharesPct.value[m] || 0) / total
+    await household.saveShares(next)
+    flash('ok', 'Распределение сохранено')
+  } catch (e) {
+    flash('err', `Не сохранилось: ${(e as Error).message}`)
+  }
 }
 
 async function logout() {
@@ -90,6 +106,14 @@ async function logout() {
       </div>
       <button class="btn-ghost px-3 py-2 text-sm" @click="logout">Выйти</button>
     </header>
+
+    <p
+      v-if="status"
+      class="mt-3 rounded-xl px-4 py-2.5 text-sm font-medium"
+      :class="status.kind === 'ok' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'"
+    >
+      {{ status.text }}
+    </p>
 
     <h2 class="mb-3 mt-6 text-sm font-bold uppercase tracking-wide text-sand-500">
       Взрослые ({{ drafts.length }})
