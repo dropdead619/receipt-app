@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const { data: matches, error } = await supabase.rpc('recipes_by_ingredients', {
     p_ingredient_ids: ingredientIds,
   })
-  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
+  if (error) throw createError({ statusCode: 500, message: error.message })
 
   const rows = (matches ?? []) as MatchRow[]
   const ids = rows.map((r) => r.recipe_id)

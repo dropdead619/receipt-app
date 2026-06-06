@@ -24,11 +24,9 @@ export default defineNuxtConfig({
     },
   },
 
-  runtimeConfig: {
-    // Только сервер (генерация рецептов / нутриенты)
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    usdaApiKey: process.env.USDA_API_KEY,
-  },
+  // ANTHROPIC_API_KEY / USDA_API_KEY НЕ кладём в runtimeConfig, иначе их значения
+  // запекаются в бандл на этапе сборки. Серверный код читает их через process.env
+  // в рантайме (см. server/utils/anthropic.ts, nutrition.ts).
 
   app: {
     head: {

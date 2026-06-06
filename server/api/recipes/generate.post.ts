@@ -6,7 +6,7 @@ import { persistRecipe } from '~~/server/utils/persistRecipe'
 export default defineEventHandler(async (event) => {
   // Только авторизованные могут запускать генерацию
   const user = await serverSupabaseUser(event)
-  if (!user) throw createError({ statusCode: 401, statusMessage: 'Требуется вход' })
+  if (!user) throw createError({ statusCode: 401, message: 'Требуется вход' })
 
   const body = await readBody<{
     cuisine?: Cuisine

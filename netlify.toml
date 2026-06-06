@@ -12,3 +12,9 @@
   NODE_VERSION = "22"
   # pnpm берётся из поля packageManager в package.json через corepack
   NETLIFY_USE_PNPM = "true"
+  # SUPABASE_URL и SUPABASE_KEY (anon/publishable) — ПУБЛИЧНЫЕ: они by design
+  # попадают в клиентский бандл. Помечаем как не-секреты, иначе сканер валит сборку.
+  # СЕКРЕТНЫЕ ключи (NUXT_SUPABASE_SECRET_KEY, ANTHROPIC_API_KEY, USDA_API_KEY)
+  # сюда НЕ добавляем — их нужно задать в Netlify со scope «Functions» (не «Builds»),
+  # тогда они не запекаются в сборку и доступны только серверной функции в рантайме.
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,SUPABASE_KEY"
