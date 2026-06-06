@@ -9,6 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "seed": "node --env-file=.env --import tsx scripts/seed-recipes.ts",
+    "seed:manual": "node --env-file=.env --import tsx scripts/seed-manual.ts",
     "gen:icons": "node --import tsx scripts/gen-icons.ts",
     "postinstall": "nuxt prepare"
   },

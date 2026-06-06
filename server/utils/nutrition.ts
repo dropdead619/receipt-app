@@ -14,8 +14,11 @@ export function normalizeName(name: string): string {
 
 const cache = new Map<string, Per100g | null>()
 
-// Номера нутриентов USDA: 208 — энергия (ккал), 203 — белок, 204 — жир, 205 — углеводы.
-const NUTRIENT = { kcal: '208', protein: '203', fat: '204', carb: '205' } as const
+// Номера нутриентов USDA: 203 — белок, 204 — жир, 205 — углеводы.
+// Энергия: 208 (kcal) в SR Legacy; у Foundation Foods бывает только Atwater —
+// 957 (general) / 958 (specific). Берём первый положительный.
+const NUTRIENT = { protein: '203', fat: '204', carb: '205' } as const
+const ENERGY_NUMS = ['208', '957', '958']
 
 export async function lookupNutrition(nameEn: string): Promise<Per100g | null> {
   const key = nameEn.trim().toLowerCase()
@@ -25,7 +28,7 @@ export async function lookupNutrition(nameEn: string): Promise<Per100g | null> {
   const url =
     `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${apiKey}` +
     `&query=${encodeURIComponent(nameEn)}` +
-    `&pageSize=1&dataType=${encodeURIComponent('Foundation,SR Legacy')}`
+    `&pageSize=10&dataType=${encodeURIComponent('Foundation,SR Legacy')}`
 
   let result: Per100g | null = null
   try {
@@ -37,11 +40,13 @@ export async function lookupNutrition(nameEn: string): Promise<Per100g | null> {
           foodNutrients?: Array<{ nutrientNumber?: string; value?: number }>
         }>
       }
-      const food = data.foods?.[0]
-      if (food?.foodNutrients) {
+      // Берём первый продукт, у которого есть положительная калорийность
+      // (первый по релевантности иногда без энергии).
+      for (const food of data.foods ?? []) {
+        if (!food.foodNutrients) continue
         const get = (num: string) =>
           food.foodNutrients!.find((n) => n.nutrientNumber === num)?.value ?? 0
-        const kcal = get(NUTRIENT.kcal)
+        const kcal = ENERGY_NUMS.map(get).find((v) => v > 0) ?? 0
         if (kcal > 0) {
           result = {
             kcal_100g: kcal,
@@ -50,6 +55,7 @@ export async function lookupNutrition(nameEn: string): Promise<Per100g | null> {
             carb_100g: get(NUTRIENT.carb),
             source_ref: `usda:${food.fdcId}`,
           }
+          break
         }
       }
     }
