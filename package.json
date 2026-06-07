@@ -11,6 +11,7 @@
     "seed": "node --env-file=.env --import tsx scripts/seed-recipes.ts",
     "seed:manual": "node --env-file=.env --import tsx scripts/seed-manual.ts",
     "gen:icons": "node --import tsx scripts/gen-icons.ts",
+    "scrape:1000menu": "node --env-file=.env --import tsx scripts/scrape-1000menu.ts",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
