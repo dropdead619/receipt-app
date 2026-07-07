@@ -43,9 +43,18 @@ function toggleCategory(c: Category) {
 <template>
   <div>
     <header class="px-4 pt-safe">
-      <div class="pt-4">
-        <h1 class="text-2xl font-extrabold text-sand-900">Рецепты</h1>
-        <p class="text-sm text-sand-500">Под ваш каллораж на двоих</p>
+      <div class="flex items-start justify-between pt-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-sand-900">Рецепты</h1>
+          <p class="text-sm text-sand-500">Под ваш каллораж на двоих</p>
+        </div>
+        <NuxtLink
+          to="/recipes/new"
+          class="grid size-10 place-items-center rounded-full bg-brand-500 text-white shadow-sm active:scale-90"
+          aria-label="Добавить рецепт"
+        >
+          <AppIcon name="plus" class="size-6" />
+        </NuxtLink>
       </div>
 
       <div class="relative mt-4">
@@ -106,8 +115,12 @@ function toggleCategory(c: Category) {
         v-else
         icon="search"
         title="Ничего не найдено"
-        text="Попробуйте изменить фильтры или сгенерировать новые рецепты."
-      />
+        text="Попробуйте изменить фильтры или добавьте свой первый рецепт."
+      >
+        <NuxtLink to="/recipes/new" class="btn-ghost mt-4">
+          <AppIcon name="plus" class="size-5" /> Добавить рецепт
+        </NuxtLink>
+      </EmptyState>
     </section>
   </div>
 </template>

@@ -123,7 +123,7 @@ async function logout() {
       <MemberEditor
         v-for="(d, i) in drafts"
         :key="d.id ?? i"
-        v-model="drafts[i]"
+        v-model="drafts[i]!"
         @save="saveMember(i)"
         @remove="removeMember(i)"
       />

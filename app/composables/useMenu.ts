@@ -18,8 +18,17 @@ export function mondayOf(date: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+/**
+ * Парсит YYYY-MM-DD как локальную дату. `new Date('YYYY-MM-DD')` трактует
+ * строку как UTC-полночь — в западных часовых поясах это сдвигает день назад.
+ */
+export function parseLocalDate(s: string): Date {
+  const [y, m, d] = s.split('-').map(Number)
+  return new Date(y!, (m ?? 1) - 1, d ?? 1)
+}
+
 export function addWeeks(weekStart: string, delta: number): string {
-  const d = new Date(weekStart)
+  const d = parseLocalDate(weekStart)
   d.setDate(d.getDate() + delta * 7)
   return mondayOf(d)
 }

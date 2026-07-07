@@ -120,17 +120,31 @@ export async function persistRecipe(
     .single()
   if (recipeErr) throw recipeErr
 
-  // 4. Связи рецепт-ингредиент (на случай дублей имени — дедуп по ingredient_id)
-  const seen = new Set<string>()
-  const links = resolved
-    .filter((r) => (seen.has(r.ingredient_id) ? false : (seen.add(r.ingredient_id), true)))
-    .map((r) => ({
-      recipe_id: recipe.id,
-      ingredient_id: r.ingredient_id,
-      grams: r.grams,
-      display_text: r.display_text,
-      is_optional: r.is_optional,
-    }))
+  // 4. Связи рецепт-ингредиент (на случай дублей имени — схлопываем по
+  // ingredient_id, суммируя граммы, чтобы совпадало с посчитанным КБЖУ)
+  const byIngredient = new Map<string, {
+    recipe_id: string
+    ingredient_id: string
+    grams: number
+    display_text: string
+    is_optional: boolean
+  }>()
+  for (const r of resolved) {
+    const prev = byIngredient.get(r.ingredient_id)
+    if (prev) {
+      prev.grams += r.grams
+      prev.is_optional = prev.is_optional && r.is_optional
+    } else {
+      byIngredient.set(r.ingredient_id, {
+        recipe_id: recipe.id,
+        ingredient_id: r.ingredient_id,
+        grams: r.grams,
+        display_text: r.display_text,
+        is_optional: r.is_optional,
+      })
+    }
+  }
+  const links = [...byIngredient.values()]
   const { error: linkErr } = await supabase.from('recipe_ingredients').insert(links)
   if (linkErr) throw linkErr
 

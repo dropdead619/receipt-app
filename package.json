@@ -10,6 +10,7 @@
     "preview": "nuxt preview",
     "seed": "node --env-file=.env --import tsx scripts/seed-recipes.ts",
     "seed:manual": "node --env-file=.env --import tsx scripts/seed-manual.ts",
+    "clear:recipes": "node --env-file=.env --import tsx scripts/clear-recipes.ts",
     "gen:icons": "node --import tsx scripts/gen-icons.ts",
     "scrape:1000menu": "node --env-file=.env --import tsx scripts/scrape-1000menu.ts",
     "postinstall": "nuxt prepare"
@@ -28,11 +29,16 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^26.1.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@parcel/watcher", "esbuild", "sharp"]
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "sharp"
+    ]
   }
 }

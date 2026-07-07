@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MEAL_LABELS, type MealType, type Recipe } from '#shared/types'
-import { addWeeks, mondayOf, useMenu, type MenuEntry } from '~/composables/useMenu'
+import { addWeeks, mondayOf, parseLocalDate, useMenu, type MenuEntry } from '~/composables/useMenu'
 
 const { getOrCreateWeek, loadEntries, setEntry, removeEntry } = useMenu()
 const { bySlug } = useRecipes()
@@ -61,11 +61,16 @@ async function buildWeekShopping() {
   buildingList.value = true
   try {
     const agg = new Map<string, number>() // ingredient_id -> grams
+    // Каждый рецепт грузим один раз, но граммовку считаем по каждому слоту меню
     const uniqueSlugs = [...new Set(entries.value.map((e) => e.recipe?.slug).filter(Boolean))] as string[]
+    const fullBySlug = new Map<string, Recipe>()
     for (const slug of uniqueSlugs) {
       const full = await bySlug(slug)
-      const entry = entries.value.find((e) => e.recipe?.slug === slug)
-      if (!full?.ingredients || !entry) continue
+      if (full) fullBySlug.set(slug, full)
+    }
+    for (const entry of entries.value) {
+      const full = entry.recipe?.slug ? fullBySlug.get(entry.recipe.slug) : undefined
+      if (!full?.ingredients) continue
       const scale = (entry.servings || servings.value) / Math.max(1, full.base_servings)
       for (const ing of full.ingredients) {
         if (ing.is_optional) continue
@@ -81,7 +86,7 @@ async function buildWeekShopping() {
 }
 
 function weekLabel(start: string): string {
-  const d = new Date(start)
+  const d = parseLocalDate(start)
   const end = new Date(d)
   end.setDate(end.getDate() + 6)
   const fmt = (x: Date) => `${x.getDate()}.${String(x.getMonth() + 1).padStart(2, '0')}`

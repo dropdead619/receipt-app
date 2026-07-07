@@ -22,22 +22,24 @@ export function useFavorites() {
     if (!uid) {
       return navigateTo('/auth/login')
     }
-    const next = new Set(ids.value)
-    if (next.has(recipeId)) {
-      next.delete(recipeId)
-      ids.value = next
-      await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', uid)
-        .eq('recipe_id', recipeId)
-    } else {
-      next.add(recipeId)
-      ids.value = next
-      await supabase
-        .from('favorites')
-        .insert({ user_id: uid, recipe_id: recipeId })
-    }
+    // Оптимистичное обновление с откатом при ошибке записи
+    const prev = ids.value
+    const next = new Set(prev)
+    const removing = next.has(recipeId)
+    if (removing) next.delete(recipeId)
+    else next.add(recipeId)
+    ids.value = next
+
+    const { error } = removing
+      ? await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', uid)
+          .eq('recipe_id', recipeId)
+      : await supabase
+          .from('favorites')
+          .insert({ user_id: uid, recipe_id: recipeId })
+    if (error) ids.value = prev
   }
 
   return { ids, load, isFavorite, toggleFavorite }

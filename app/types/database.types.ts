@@ -17,7 +17,7 @@ type Row<T> = T
 type Insert<T> = Partial<T>
 type Update<T> = Partial<T>
 
-interface IngredientRow {
+type IngredientRow = {
   id: string
   name: string
   name_normalized: string
@@ -29,7 +29,7 @@ interface IngredientRow {
   created_at: string
 }
 
-interface RecipeRow {
+type RecipeRow = {
   id: string
   slug: string
   title: string
@@ -49,7 +49,7 @@ interface RecipeRow {
   created_at: string
 }
 
-interface RecipeIngredientRow {
+type RecipeIngredientRow = {
   recipe_id: string
   ingredient_id: string
   grams: number
@@ -57,7 +57,7 @@ interface RecipeIngredientRow {
   is_optional: boolean
 }
 
-interface HouseholdMemberRow {
+type HouseholdMemberRow = {
   id: string
   user_id: string
   name: string
@@ -75,19 +75,19 @@ interface HouseholdMemberRow {
   created_at: string
 }
 
-interface UserSettingsRow {
+type UserSettingsRow = {
   user_id: string
   meal_shares: Record<MealType, number>
   updated_at: string
 }
 
-interface FavoriteRow {
+type FavoriteRow = {
   user_id: string
   recipe_id: string
   created_at: string
 }
 
-interface PantryItemRow {
+type PantryItemRow = {
   id: string
   user_id: string
   ingredient_id: string
@@ -96,14 +96,14 @@ interface PantryItemRow {
   created_at: string
 }
 
-interface WeeklyMenuRow {
+type WeeklyMenuRow = {
   id: string
   user_id: string
   week_start_date: string
   created_at: string
 }
 
-interface MenuEntryRow {
+type MenuEntryRow = {
   id: string
   menu_id: string
   day_of_week: number
@@ -112,7 +112,7 @@ interface MenuEntryRow {
   servings: number
 }
 
-interface ShoppingListItemRow {
+type ShoppingListItemRow = {
   id: string
   user_id: string
   ingredient_id: string
@@ -122,7 +122,10 @@ interface ShoppingListItemRow {
   created_at: string
 }
 
-export interface Database {
+// ВАЖНО: именно type, а не interface — у interface нет неявной индексной
+// сигнатуры, из-за чего Database не проходит constraint supabase-js
+// (Record<string, GenericSchema>) и все таблицы вырождаются в never.
+export type Database = {
   public: {
     Tables: {
       ingredients: { Row: Row<IngredientRow>; Insert: Insert<IngredientRow>; Update: Update<IngredientRow>; Relationships: [] }

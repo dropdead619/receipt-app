@@ -14,11 +14,14 @@ const { load: loadFav } = useFavorites()
 
 const onlyComplete = ref(false)
 
+// useRequestFetch: при SSR пробрасывает cookies авторизации во внутренний API
+const requestFetch = useRequestFetch()
+
 const { data, pending } = await useAsyncData<Match[]>('cook-matches', async () => {
   const pantry = await pantryList()
   const ids = pantry.map((p) => p.ingredient_id)
   if (!ids.length) return []
-  const res = await $fetch<{ recipes: Match[] }>('/api/recipes/by-ingredients', {
+  const res = await requestFetch<{ recipes: Match[] }>('/api/recipes/by-ingredients', {
     method: 'POST',
     body: { ingredientIds: ids },
   })

@@ -3,6 +3,8 @@
 // Сессия же содержит user.id единообразно — берём из неё как основной источник.
 export function currentUserId(): string | null {
   const user = useSupabaseUser().value as { sub?: string; id?: string } | null
-  const session = useSupabaseSession().value
+  // useSupabaseSession типизирован как Omit<Session, 'user'>, но в рантайме
+  // объект user в сессии присутствует — читаем через локальный тип.
+  const session = useSupabaseSession().value as { user?: { id?: string } } | null
   return user?.sub ?? user?.id ?? session?.user?.id ?? null
 }
