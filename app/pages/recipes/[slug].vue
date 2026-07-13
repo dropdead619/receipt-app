@@ -99,8 +99,10 @@ async function addMissingToShopping() {
     <div class="space-y-5 px-4 py-4">
       <header>
         <div class="mb-1 flex gap-2 text-xs font-semibold text-brand-600">
-          <span>{{ CUISINE_LABELS[recipe.cuisine] }}</span>
-          <span class="text-sand-300">•</span>
+          <template v-if="recipe.cuisine">
+            <span>{{ CUISINE_LABELS[recipe.cuisine] }}</span>
+            <span class="text-sand-300">•</span>
+          </template>
           <span>{{ CATEGORY_LABELS[recipe.category] }}</span>
         </div>
         <h1 class="text-2xl font-extrabold leading-tight text-sand-900">

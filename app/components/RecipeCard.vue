@@ -46,6 +46,7 @@ async function onFav(e: Event) {
       </button>
 
       <span
+        v-if="recipe.cuisine"
         class="absolute bottom-2 left-2 rounded-full bg-black/55 px-2 py-1 text-[11px] font-medium text-white backdrop-blur"
       >
         {{ CUISINE_LABELS[recipe.cuisine] }}

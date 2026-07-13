@@ -34,7 +34,7 @@ type RecipeRow = {
   slug: string
   title: string
   description: string | null
-  cuisine: Cuisine
+  cuisine: Cuisine | null
   category: Category
   base_servings: number
   time_minutes: number

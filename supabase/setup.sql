@@ -46,7 +46,7 @@ create table recipes (
   slug text not null unique,
   title text not null,
   description text,
-  cuisine cuisine not null,
+  cuisine cuisine,
   category category not null,
   base_servings int not null default 2 check (base_servings > 0),
   time_minutes int not null default 30,

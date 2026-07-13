@@ -19,15 +19,14 @@ const categories = Object.entries(CATEGORY_LABELS) as [Category, string][]
 const form = reactive({
   title: '',
   description: '',
-  cuisine: 'russian' as Cuisine,
+  cuisine: null as Cuisine | null,
   category: 'main' as Category,
   base_servings: 2,
   time_minutes: 30,
-  image_url: '',
-  kcal_per_serving: null as number | null,
-  protein_per_serving: null as number | null,
-  fat_per_serving: null as number | null,
-  carb_per_serving: null as number | null,
+  kcal_100g: null as number | null,
+  protein_100g: null as number | null,
+  fat_100g: null as number | null,
+  carb_100g: null as number | null,
 })
 
 const ingredients = ref<IngredientRow[]>([emptyIngredient()])
@@ -62,17 +61,27 @@ function moveStep(i: number, delta: -1 | 1) {
 const saving = ref(false)
 const error = ref('')
 
+// Общий вес блюда по ингредиентам — из него сервер считает КБЖУ порции
+const totalGrams = computed(() =>
+  ingredients.value
+    .filter((i) => i.name.trim())
+    .reduce((s, i) => s + (i.grams || 0), 0),
+)
+const kcalPerServing = computed(() => {
+  if (!form.kcal_100g || !totalGrams.value || !form.base_servings) return null
+  return Math.round((form.kcal_100g * totalGrams.value) / 100 / form.base_servings)
+})
+
 function validate(): string | null {
   if (!form.title.trim()) return 'Укажите название рецепта'
   if (!form.base_servings || form.base_servings < 1) return 'Укажите количество порций'
   if (!form.time_minutes || form.time_minutes < 1) return 'Укажите время приготовления'
-  if (!form.kcal_per_serving || form.kcal_per_serving <= 0)
-    return 'Укажите калорийность порции'
+  if (!form.kcal_100g || form.kcal_100g <= 0)
+    return 'Укажите калорийность на 100 грамм'
   const filledIngredients = ingredients.value.filter((i) => i.name.trim())
   if (!filledIngredients.length) return 'Добавьте хотя бы один ингредиент'
-  for (const ing of filledIngredients) {
-    if (!ing.grams || ing.grams <= 0) return `Укажите граммы для «${ing.name.trim()}»`
-  }
+  if (!totalGrams.value)
+    return 'Укажите вес хотя бы одного ингредиента — без него не рассчитать КБЖУ порции'
   if (!steps.value.some((s) => s.trim())) return 'Добавьте хотя бы один шаг приготовления'
   return null
 }
@@ -90,9 +99,9 @@ async function submit() {
       method: 'POST',
       body: {
         ...form,
-        protein_per_serving: form.protein_per_serving ?? 0,
-        fat_per_serving: form.fat_per_serving ?? 0,
-        carb_per_serving: form.carb_per_serving ?? 0,
+        protein_100g: form.protein_100g ?? 0,
+        fat_100g: form.fat_100g ?? 0,
+        carb_100g: form.carb_100g ?? 0,
         ingredients: ingredients.value
           .filter((i) => i.name.trim())
           .map((i) => ({ ...i, name: i.name.trim() })),
@@ -121,7 +130,7 @@ async function submit() {
       </button>
       <div>
         <h1 class="text-2xl font-extrabold text-sand-900">Новый рецепт</h1>
-        <p class="text-sm text-sand-500">Заполните все поля и шаги</p>
+        <p class="text-sm text-sand-500">Поля со звёздочкой обязательны</p>
       </div>
     </header>
 
@@ -149,6 +158,7 @@ async function submit() {
           <label class="block">
             <span class="mb-1 block text-xs font-medium text-sand-500">Кухня</span>
             <select v-model="form.cuisine" class="input py-2.5">
+              <option :value="null">Не указана</option>
               <option v-for="[v, l] in cuisines" :key="v" :value="v">{{ l }}</option>
             </select>
           </label>
@@ -182,58 +192,60 @@ async function submit() {
           </label>
         </div>
 
-        <label class="block">
-          <span class="mb-1 block text-xs font-medium text-sand-500">Ссылка на фото</span>
-          <input
-            v-model="form.image_url"
-            type="url"
-            placeholder="https://…"
-            class="input"
-          />
-        </label>
       </section>
 
-      <!-- КБЖУ на порцию -->
+      <!-- КБЖУ на 100 грамм -->
       <section class="card space-y-3 p-4">
-        <h2 class="text-sm font-bold uppercase tracking-wide text-sand-500">КБЖУ на порцию</h2>
+        <h2 class="text-sm font-bold uppercase tracking-wide text-sand-500">КБЖУ на 100 грамм</h2>
         <div class="grid grid-cols-4 gap-2">
           <label class="block">
             <span class="mb-1 block text-[10px] font-medium text-sand-500">ккал *</span>
             <input
-              v-model.number="form.kcal_per_serving"
+              v-model.number="form.kcal_100g"
               type="number"
-              min="1"
+              min="0"
+              step="any"
+              inputmode="decimal"
               class="input px-2 py-2 text-sm"
             />
           </label>
           <label class="block">
             <span class="mb-1 block text-[10px] font-medium text-sand-500">Белки, г</span>
             <input
-              v-model.number="form.protein_per_serving"
+              v-model.number="form.protein_100g"
               type="number"
               min="0"
+              step="any"
+              inputmode="decimal"
               class="input px-2 py-2 text-sm"
             />
           </label>
           <label class="block">
             <span class="mb-1 block text-[10px] font-medium text-sand-500">Жиры, г</span>
             <input
-              v-model.number="form.fat_per_serving"
+              v-model.number="form.fat_100g"
               type="number"
               min="0"
+              step="any"
+              inputmode="decimal"
               class="input px-2 py-2 text-sm"
             />
           </label>
           <label class="block">
             <span class="mb-1 block text-[10px] font-medium text-sand-500">Углев., г</span>
             <input
-              v-model.number="form.carb_per_serving"
+              v-model.number="form.carb_100g"
               type="number"
               min="0"
+              step="any"
+              inputmode="decimal"
               class="input px-2 py-2 text-sm"
             />
           </label>
         </div>
+        <p v-if="kcalPerServing" class="text-xs text-sand-500">
+          Вес блюда по ингредиентам: {{ totalGrams }} г · ≈{{ kcalPerServing }} ккал на порцию
+        </p>
       </section>
 
       <!-- Ингредиенты -->
@@ -266,7 +278,9 @@ async function submit() {
             <input
               v-model.number="ing.grams"
               type="number"
-              min="1"
+              min="0"
+              step="any"
+              inputmode="decimal"
               placeholder="Граммы"
               class="input w-24 py-2.5"
             />
