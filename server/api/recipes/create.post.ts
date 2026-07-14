@@ -18,10 +18,12 @@ export interface CreateRecipeBody {
   base_servings: number
   time_minutes: number
   image_url?: string
-  kcal_100g: number
-  protein_100g: number
-  fat_100g: number
-  carb_100g: number
+  /** В чём заданы kcal/protein/fat/carb: на порцию или на 100 г блюда */
+  nutrition_basis?: 'per_serving' | 'per_100g'
+  kcal: number
+  protein: number
+  fat: number
+  carb: number
   ingredients: IngredientInput[]
   steps: string[]
 }
@@ -55,12 +57,14 @@ export default defineEventHandler(async (event) => {
   const timeMinutes = Math.round(num(body.time_minutes, 30))
   if (timeMinutes < 1 || timeMinutes > 24 * 60) bad('Время приготовления: от 1 минуты до суток')
 
-  const kcal100 = num(body.kcal_100g)
-  const protein100 = num(body.protein_100g)
-  const fat100 = num(body.fat_100g)
-  const carb100 = num(body.carb_100g)
-  if (kcal100 <= 0) bad('Укажите калорийность на 100 грамм')
-  if (protein100 < 0 || fat100 < 0 || carb100 < 0) bad('БЖУ не могут быть отрицательными')
+  const basis = body.nutrition_basis === 'per_serving' ? 'per_serving' : 'per_100g'
+  const kcalIn = num(body.kcal)
+  const proteinIn = num(body.protein)
+  const fatIn = num(body.fat)
+  const carbIn = num(body.carb)
+  if (kcalIn <= 0)
+    bad(basis === 'per_100g' ? 'Укажите калорийность на 100 грамм' : 'Укажите калорийность порции')
+  if (proteinIn < 0 || fatIn < 0 || carbIn < 0) bad('БЖУ не могут быть отрицательными')
 
   const imageUrl = String(body.image_url ?? '').trim()
   if (imageUrl && !/^https?:\/\//.test(imageUrl)) bad('Ссылка на фото должна начинаться с http(s)://')
@@ -75,17 +79,23 @@ export default defineEventHandler(async (event) => {
     .filter((i) => i.name)
   if (!ingredients.length) bad('Добавьте хотя бы один ингредиент')
 
-  // КБЖУ задан на 100 г блюда → порцию считаем через общий вес ингредиентов
-  const totalGrams = ingredients.reduce((s, i) => s + i.grams, 0)
-  if (totalGrams <= 0)
-    bad('Укажите вес хотя бы одного ингредиента — без него не рассчитать КБЖУ порции')
-
-  const gramsPerServing = totalGrams / servings
-  const per100 = (v: number) => Math.round(((v * gramsPerServing) / 100) * 10) / 10
-  const kcal = per100(kcal100)
-  const protein = per100(protein100)
-  const fat = per100(fat100)
-  const carb = per100(carb100)
+  // КБЖУ храним на порцию; если задан на 100 г — пересчитываем через общий вес ингредиентов
+  const round1 = (v: number) => Math.round(v * 10) / 10
+  let kcal = round1(kcalIn)
+  let protein = round1(proteinIn)
+  let fat = round1(fatIn)
+  let carb = round1(carbIn)
+  if (basis === 'per_100g') {
+    const totalGrams = ingredients.reduce((s, i) => s + i.grams, 0)
+    if (totalGrams <= 0)
+      bad('Укажите вес хотя бы одного ингредиента — без него не пересчитать КБЖУ на порцию')
+    const gramsPerServing = totalGrams / servings
+    const toServing = (v: number) => round1((v * gramsPerServing) / 100)
+    kcal = toServing(kcalIn)
+    protein = toServing(proteinIn)
+    fat = toServing(fatIn)
+    carb = toServing(carbIn)
+  }
 
   const steps = (body.steps ?? []).map((s) => String(s ?? '').trim()).filter(Boolean)
   if (!steps.length) bad('Добавьте хотя бы один шаг приготовления')
