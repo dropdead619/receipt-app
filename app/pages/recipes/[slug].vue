@@ -84,6 +84,13 @@ async function addMissingToShopping() {
       >
         <AppIcon name="chevronLeft" class="size-6 text-sand-700" />
       </button>
+      <NuxtLink
+        :to="`/recipes/${slug}/edit`"
+        class="absolute right-14 top-3 grid size-10 place-items-center rounded-full bg-white/90 backdrop-blur active:scale-90"
+        aria-label="Редактировать"
+      >
+        <AppIcon name="pencil" class="size-5 text-sand-600" />
+      </NuxtLink>
       <button
         class="absolute right-3 top-3 grid size-10 place-items-center rounded-full bg-white/90 backdrop-blur active:scale-90"
         @click="toggleFavorite(recipe.id)"
